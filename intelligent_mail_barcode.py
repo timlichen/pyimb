@@ -245,7 +245,7 @@ def decode (codes):
     r = []
     for i in range (10):
         code = codes[i]
-        if not inverted.has_key (code):
+        if code not in inverted:
             code = code ^ 0x1fff
             fcs |= 1<<i
         bump, val = inverted[code]
@@ -363,12 +363,12 @@ samples = [
 
 # example 4 from the spec
 def t0():
-    return encode (1, 234, 567094, 987654321, '01234567891')
+    return encode(1, 234, 567094, 987654321, '01234567891')
 
 
 # quasi-real address
 def t1():
-    return encode (0, 700, 314159, 0o00000001, '95008200130')
+    return encode(0, 700, 314159, 0o00000001, '95008200130')
 
 
 def run_tests():
@@ -416,13 +416,9 @@ if __name__ == '__main__':
             "    -h barcode-id service-type mailer-id serial delivery : encode to HTML\n"
             "\n"
             "Example: %s -e 1 700 314159 99999 20500000399\n"
-            "   [that's the White House, 1600 Pennsylvania Ave]\n"
+            "   [that's the White House, 1600 Pennsylvania Ave NW, Washington, DC 20500]\n"
             "Note: <delivery> is 5+4 digits of zip, plus 2 digits of delivery point,\n"
             "  (usually the last two digits of the street address).\n" % (
                 sys.argv[0], sys.argv[0]
                 )
             )
-        
-            
-            
-    
