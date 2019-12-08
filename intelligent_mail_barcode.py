@@ -29,10 +29,10 @@ import sys
 W = sys.stderr.write
 
 # Note: this could probably be written much more simply...
-def crc11 (input):
+def crc11 (bytes_input):
     gen_poly = 0x0f35
     FCS = 0x07ff
-    data = input[0] << 5
+    data = bytes_input[0] << 5
     pos = 1
     # do the most significant byte skipping the 2 most significant bits
     for bit in range (2, 8):
@@ -44,7 +44,7 @@ def crc11 (input):
         data <<= 1
     # do the rest of the bytes
     for byte_index in range (1, 13):
-        data = input[byte_index] << 3
+        data = bytes_input[byte_index] << 3
         for bit in range (8):
             if (FCS ^ data) & 0x400:
                 FCS = (FCS << 1) ^ gen_poly
@@ -54,12 +54,12 @@ def crc11 (input):
             data <<= 1
     return FCS
 
-def reverse_int16 (input):
+def reverse_int16 (bytes_input):
     reverse = 0
     for i in range (16):
         reverse <<= 1
-        reverse |= input & 1
-        input >>= 1
+        reverse |= bytes_input & 1
+        bytes_input >>= 1
     return reverse
 
 # no clue what this code actually does, it's not explained in the source.
@@ -97,11 +97,11 @@ def make_inverted_tabs():
     global inverted
     inverted = {}
     for k, v in tab5.items():
-        if inverted.has_key (v):
+        if v in inverted:
             raise ValueError
         inverted[v] = (0, k)
     for k, v in tab2.items():
-        if inverted.has_key (v):
+        if v in inverted:
             raise ValueError
         inverted[v] = (1, k)
 
@@ -262,16 +262,16 @@ def decode (codes):
     a, tracking = unconvert_tracking_code (binary)
     routing = unconvert_routing_code (a)
     routing = '%d' % (routing,)
-    print 'routing', routing
+    print('routing', routing)
     if len(routing) == 11:
-        print 'zip %s-%s delivery point %s' % (routing[:5], routing[5:9], routing[9:])
+        print('zip %s-%s delivery point %s' % (routing[:5], routing[5:9], routing[9:]))
     elif len(routing) == 9:
-        print 'zip %s-%s' % (routing[:5], routing[5:9])
+        print('zip %s-%s' % (routing[:5], routing[5:9]))
     elif len(routing) == 5:
-        print 'zip %s' % (routing[:5],)
+        print('zip %s' % (routing[:5],))
     else:
-        print 'zip: empty'
-    print 'tracking', tracking
+        print('zip: empty')
+    print('tracking', tracking)
     barcode_id = tracking[0:2]
     service_type = tracking[2:5]
     if tracking[5] == '9':
@@ -280,10 +280,10 @@ def decode (codes):
     else:
         mailer_id = tracking[5:5+6]
         serial = tracking[5+6:5+6+9]
-    print 'barcode_id', barcode_id
-    print 'service_type', service_type
-    print 'mailer_id', mailer_id
-    print 'serial', serial
+    print('barcode_id', barcode_id)
+    print('service_type', service_type)
+    print('mailer_id', mailer_id)
+    print('serial', serial)
 
 def render_ascii (code):
     "render the letter sequence into something resembling the actual bar code"
@@ -360,23 +360,27 @@ samples = [
     "FAFFATDATTATFFFFTFTFFDTFFDAFDADTTDFAFDAADFTTDATDTATTDFDDTFFFFFTFD",
     ]
 
+
 # example 4 from the spec
 def t0():
     return encode (1, 234, 567094, 987654321, '01234567891')
 
+
 # quasi-real address
 def t1():
-    return encode (0, 700, 314159, 000000001, '95008200130')
+    return encode (0, 700, 314159, 0o00000001, '95008200130')
+
 
 def run_tests():
     code = t0()
-    print code
+    print(code)
     code = t1()
     decode (code)
     for sample in samples:
         render_ascii (sample)
-        decode (sample)
-    
+        decode(sample)
+
+
 process_bar_table()
 tab5 = init_n_of_13 (5, 1287)
 tab2 = init_n_of_13 (2, 78)
@@ -395,13 +399,13 @@ if __name__ == '__main__':
         sys.argv.remove ('-e')
         barcode_id, service_type, mailer, serial, delivery = sys.argv[1:]
         code = encode (int(barcode_id), int(service_type), int(mailer), int(serial), delivery)
-        print code
+        print(code)
         render_ascii (code)
     elif '-h' in sys.argv:
         sys.argv.remove ('-h')
         barcode_id, service_type, mailer, serial, delivery = sys.argv[1:]
         code = encode (int(barcode_id), int(service_type), int(mailer), int(serial), delivery)
-        render_html (code)
+        render_html(code)
     else:
         import sys
         sys.stderr.write (
