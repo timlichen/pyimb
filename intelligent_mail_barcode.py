@@ -290,7 +290,7 @@ def render_ascii (code):
     center = ['|'] * 65
     blank  = [' '] * 65
     r = blank[:], center[:], blank[:]
-    for i in range (65):
+    for i in range(65):
         if code[i] == 'A':
             r[0][i] = '|'
         elif code[i] == 'D':
@@ -400,7 +400,6 @@ if __name__ == '__main__':
         barcode_id, service_type, mailer, serial, delivery = sys.argv[1:]
         code = encode (int(barcode_id), int(service_type), int(mailer), int(serial), delivery)
         print(code)
-        render_ascii (code)
     elif '-h' in sys.argv:
         sys.argv.remove ('-h')
         barcode_id, service_type, mailer, serial, delivery = sys.argv[1:]
